@@ -27,6 +27,7 @@ import { materialInstanceToolDocs } from "@/server/tools/material-instances";
 import { uvToolDocs } from "@/server/tools/uv";
 import { historyToolDocs } from "@/server/tools/history";
 import { exportToolDocs } from "@/server/tools/export";
+import { exportJavaBlockToolDocs } from "@/server/tools/export-java-block";
 
 export interface ICategoryGroup {
   category: string;
@@ -41,7 +42,7 @@ export const toolManifest: ICategoryGroup[] = [
   { category: "Armature", tools: armatureToolDocs },
   { category: "Display Settings", tools: displayToolDocs },
   { category: "Elements", tools: elementToolDocs },
-  { category: "Export", tools: exportToolDocs },
+  { category: "Export", tools: [...exportToolDocs, ...exportJavaBlockToolDocs] },
   { category: "History", tools: historyToolDocs },
   { category: "Import/Export", tools: importToolDocs },
   { category: "Material Instances", tools: materialInstanceToolDocs },
