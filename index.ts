@@ -6,6 +6,7 @@
 /// <reference types="three" />
 /// <reference types="blockbench-types" />
 import { VERSION } from "@/lib/constants";
+import { resolveLaunchPortOverride } from "@/lib/config";
 import { effectiveInstructions } from "@/lib/instructions";
 import { createServer } from "@/server/server";
 import { tools, prompts } from "@/server/tools";
@@ -95,7 +96,11 @@ BBPlugin.register("mcp", {
       Settings.get("mcp_sse_heartbeat"),
       15
     );
-    const address = resolveServerAddress(Settings.get("mcp_port"), Settings.get("mcp_endpoint"));
+    const launchPort = resolveLaunchPortOverride();
+    if (launchPort !== null) {
+      console.log(`[MCP] Using launch argument port override: ${launchPort}`);
+    }
+    const address = resolveServerAddress(launchPort ?? Settings.get("mcp_port"), Settings.get("mcp_endpoint"));
     address.warnings.forEach((warning) => {
       console.warn(`[MCP] ${warning}`);
       Blockbench.showQuickMessage(warning, 5000);

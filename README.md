@@ -36,6 +36,8 @@ See [headless/README.md](headless/README.md) for client configuration, the tool 
 
 Configure the MCP server under Blockbench settings: **Settings** > **General** > **MCP Server Port** and **MCP Server Endpoint**.
 
+To run multiple Blockbench MCP sessions at once, launch each Blockbench instance with its own port override, for example `--mcp-port=3001`. When present, the launch argument takes precedence over the saved port setting.
+
 > The following installation settings examples use the default values of `:3000/bb-mcp`
 
 ## Installation

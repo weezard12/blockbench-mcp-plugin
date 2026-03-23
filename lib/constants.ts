@@ -21,6 +21,8 @@ export const STATUS_EXPERIMENTAL = "experimental";
 export const DEFAULT_MCP_PORT = 3000;
 /** Default MCP endpoint path served by the plugin (Settings > General > MCP endpoint). */
 export const DEFAULT_MCP_ENDPOINT = "/bb-mcp";
+/** Launch argument that overrides the saved MCP port, so several Blockbench instances can run at once (`--mcp-port=3001`). */
+export const MCP_PORT_LAUNCH_ARG = "--mcp-port";
 
 /**
  * Tolerance for degenerate geometry checks (zero-length edges, collinear

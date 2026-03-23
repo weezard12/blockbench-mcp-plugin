@@ -1,4 +1,5 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { resolveLaunchPortOverride } from "@/lib/config";
 import { sessionManager, type ISession } from "@/lib/sessions";
 import { resolveServerAddress } from "@/server/net-security";
 import statusBarCSS from "@/ui/statusBar.css";
@@ -9,7 +10,7 @@ let statusStyles: Deletable | undefined;
 
 export function statusBarSetup(server: McpServer): void {
   // The address the server actually listens on: invalid settings fall back to the defaults.
-  const { port, endpoint } = resolveServerAddress(Settings.get("mcp_port"), Settings.get("mcp_endpoint"));
+  const { port, endpoint } = resolveServerAddress(resolveLaunchPortOverride() ?? Settings.get("mcp_port"), Settings.get("mcp_endpoint"));
 
   // Add CSS for the status bar
   statusStyles = Blockbench.addCSS(statusBarCSS);
