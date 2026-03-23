@@ -66,5 +66,8 @@ export function resolveLaunchArgumentPort(argv: readonly string[]): number | nul
 
 /** The launch-argument port override of this Blockbench process, or null. */
 export function resolveLaunchPortOverride(): number | null {
-  return resolveLaunchArgumentPort(Array.isArray(process.argv) ? process.argv : []);
+  // Blockbench exposes launch arguments on Blockbench.argv, not process.argv
+  // @ts-ignore - Blockbench is a global in the plugin environment
+  const argv: string[] = Array.isArray(Blockbench.argv) ? Blockbench.argv : (Array.isArray(process.argv) ? process.argv : []);
+  return resolveLaunchArgumentPort(argv);
 }
