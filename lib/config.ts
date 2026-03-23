@@ -81,9 +81,10 @@ function resolveEndpoint(): string {
 }
 
 export function resolveMcpServerConfig(): ResolvedMcpServerConfig {
-  const launchArgumentPort = resolveLaunchArgumentPort(
-    Array.isArray(process.argv) ? process.argv : []
-  );
+  // Blockbench exposes launch arguments on Blockbench.argv, not process.argv
+  // @ts-ignore - Blockbench is a global in the plugin environment
+  const argv: string[] = Array.isArray(Blockbench.argv) ? Blockbench.argv : (Array.isArray(process.argv) ? process.argv : []);
+  const launchArgumentPort = resolveLaunchArgumentPort(argv);
 
   if (launchArgumentPort !== null) {
     return {
