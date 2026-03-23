@@ -6,6 +6,7 @@
 /// <reference types="three" />
 /// <reference types="blockbench-types" />
 import { VERSION } from "@/lib/constants";
+import { resolveMcpServerConfig } from "@/lib/config";
 import { createServer } from "@/server/server";
 import { tools, prompts } from "@/server/tools";
 import { resources } from "@/server";
@@ -48,10 +49,15 @@ BBPlugin.register("mcp", {
 
     settingsSetup();
 
+    const serverConfig = resolveMcpServerConfig();
+    if (serverConfig.portSource === "launch-arg") {
+      console.log(`[MCP] Using launch argument port override: ${serverConfig.port}`);
+    }
+
     // Create TCP server to handle HTTP requests
     [httpServer, sessionTransports] = createNetServer(net, {
-      port: Number(Settings.get("mcp_port") || 3000),
-      endpoint: String(Settings.get("mcp_endpoint") || "/bb-mcp")
+      port: serverConfig.port,
+      endpoint: serverConfig.endpoint,
     });
 
     // Create a reference server for UI display purposes

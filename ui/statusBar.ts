@@ -1,4 +1,5 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { resolveMcpServerConfig } from "@/lib/config";
 import { sessionManager, type Session } from "@/lib/sessions";
 import statusBarCSS from "@/ui/statusBar.css";
 
@@ -6,8 +7,7 @@ let statusBarElement: HTMLDivElement | undefined;
 let unsubscribe: (() => void) | undefined;
 
 export function statusBarSetup(server: McpServer): void {
-  const port = Settings.get("mcp_port") || 3000;
-  const endpoint = Settings.get("mcp_endpoint") || "/bb-mcp";
+  const { port, endpoint } = resolveMcpServerConfig();
 
   // Add CSS for the status bar
   Blockbench.addCSS(statusBarCSS);

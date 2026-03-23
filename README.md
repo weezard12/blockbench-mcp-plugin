@@ -12,6 +12,8 @@ Open the desktop version of Blockbench, go to File > Plugins and click the "Load
 
 Configure the MCP server under Blockbench settings: **Settings** > **General** > **MCP Server Port** and **MCP Server Endpoint**
 
+To run multiple Blockbench MCP sessions at once, launch each Blockbench instance with its own port override, for example `--mcp-port=3001`. When present, the launch argument takes precedence over the saved port setting.
+
 The following examples use the default values of `:3000/bb-mcp`
 
 ### Installation
