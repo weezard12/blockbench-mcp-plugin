@@ -16,6 +16,7 @@ import { registerTextureTools } from "./tools/texture";
 import { registerUITools } from "./tools/ui";
 import { registerUVTools } from "./tools/uv";
 import { registerMaterialInstanceTools } from "./tools/material-instances";
+import { registerExportTools } from "./tools/export";
 import { registerArmatureTools } from "./tools/armature";
 
 // Core resource registrations
@@ -41,6 +42,7 @@ const registrationFunctions = [
   registerTextureTools,
   registerUITools,
   registerUVTools,
+  registerExportTools,
   registerValidatorResources,
 ];
 

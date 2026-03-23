@@ -6,6 +6,7 @@ import { cameraToolDocs } from "../server/tools/camera";
 import { cubeToolDocs } from "../server/tools/cubes";
 import { elementToolDocs } from "../server/tools/element";
 import { importToolDocs } from "../server/tools/import";
+import { exportToolDocs } from "../server/tools/export";
 import { meshToolDocs } from "../server/tools/mesh";
 import { paintToolDocs } from "../server/tools/paint";
 import { projectToolDocs } from "../server/tools/project";
@@ -28,7 +29,7 @@ export const toolManifest: CategoryGroup[] = [
   { category: "Animation", tools: animationToolDocs },
   { category: "Armature", tools: armatureToolDocs },
   { category: "Elements", tools: elementToolDocs },
-  { category: "Import/Export", tools: importToolDocs },
+  { category: "Import/Export", tools: [...importToolDocs, ...exportToolDocs] },
   { category: "Material Instances", tools: materialInstanceToolDocs },
   { category: "Mesh Editing", tools: meshToolDocs },
   { category: "Paint Tools", tools: paintToolDocs },
