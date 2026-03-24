@@ -9,6 +9,7 @@ import { importToolDocs } from "../server/tools/import";
 import { exportToolDocs } from "../server/tools/export";
 import { meshToolDocs } from "../server/tools/mesh";
 import { paintToolDocs } from "../server/tools/paint";
+import { displayToolDocs } from "../server/tools/display";
 import { projectToolDocs } from "../server/tools/project";
 import { textureToolDocs } from "../server/tools/texture";
 import { armatureToolDocs } from "../server/tools/armature";
@@ -33,7 +34,7 @@ export const toolManifest: CategoryGroup[] = [
   { category: "Material Instances", tools: materialInstanceToolDocs },
   { category: "Mesh Editing", tools: meshToolDocs },
   { category: "Paint Tools", tools: paintToolDocs },
-  { category: "Project", tools: projectToolDocs },
+  { category: "Project", tools: [...projectToolDocs, ...displayToolDocs] },
   { category: "Textures", tools: textureToolDocs },
   { category: "UI Interaction", tools: uiToolDocs },
   { category: "UV Mapping", tools: uvToolDocs },
