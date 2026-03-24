@@ -7,6 +7,7 @@ import { capabilityToolDocs } from "@/server/tools/capabilities";
 import { cubeToolDocs } from "@/server/tools/cubes";
 import { cubeUvToolDocs } from "@/server/tools/cube-uv";
 import { displayToolDocs } from "@/server/tools/display";
+import { autoCorrectDisplayToolDocs } from "@/server/tools/auto-correct-display";
 import { elementToolDocs } from "@/server/tools/element";
 import { importToolDocs } from "@/server/tools/import";
 import { knifeToolDocs } from "@/server/tools/knife";
@@ -40,7 +41,7 @@ export const toolManifest: ICategoryGroup[] = [
   { category: "Capabilities", tools: capabilityToolDocs },
   { category: "Animation", tools: animationToolDocs },
   { category: "Armature", tools: armatureToolDocs },
-  { category: "Display Settings", tools: displayToolDocs },
+  { category: "Display Settings", tools: [...displayToolDocs, ...autoCorrectDisplayToolDocs] },
   { category: "Elements", tools: elementToolDocs },
   { category: "Export", tools: [...exportToolDocs, ...exportJavaBlockToolDocs] },
   { category: "History", tools: historyToolDocs },
