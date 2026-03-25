@@ -11,6 +11,8 @@ import { registerCubesTools } from "@/server/tools/cubes";
 import { registerCubeUvTools } from "@/server/tools/cube-uv";
 import { registerDisplayTools } from "@/server/tools/display";
 import { registerAutoCorrectDisplayTools } from "@/server/tools/auto-correct-display";
+import { registerCenterTools } from "@/server/tools/center";
+import { registerAutoCorrectDisplayTools } from "@/server/tools/auto-correct-display";
 import { registerElementTools } from "@/server/tools/element";
 import { registerImportTools } from "@/server/tools/import";
 import { registerKnifeTools } from "@/server/tools/knife";
@@ -48,6 +50,8 @@ const registrationFunctions = [
   registerCubesTools,
   registerCubeUvTools,
   registerDisplayTools,
+  registerAutoCorrectDisplayTools,
+  registerCenterTools,
   registerAutoCorrectDisplayTools,
   registerElementTools,
   registerExportTools,
