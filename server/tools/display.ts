@@ -4,8 +4,17 @@ import type * as ThreeNamespace from "three";
 import { z } from "zod";
 import { createTool, type ToolSpec } from "@/lib/factories";
 import { STATUS_EXPERIMENTAL } from "@/lib/constants";
-
-const Three = globalThis.THREE as typeof ThreeNamespace;
+import {
+  Three,
+  assertJavaBlockProject,
+  describeMatch,
+  findUniqueNamedMatchOrThrow,
+  getModelSpaceBoundsForMatch,
+  roundNumber,
+  roundVec3,
+  type NamedMatch,
+  type Vec3Tuple,
+} from "./alignment-shared";
 
 const HAND_SLOTS = [
   "thirdperson_righthand",
@@ -16,8 +25,6 @@ const HAND_SLOTS = [
 const HANDLE_GRIP_VERTICAL_BIAS_RATIO = 0.25;
 
 type HandSlot = (typeof HAND_SLOTS)[number];
-type NamedMatch = Group | OutlinerElement;
-type Vec3Tuple = [number, number, number];
 
 interface SlotCorrectionResult {
   beforeTranslation: Vec3Tuple;
@@ -66,7 +73,7 @@ export const displayToolDocs: ToolSpec[] = [
   {
     name: "auto_correct_display_settings",
     description:
-      "Automatically corrects java_block hand display settings by centering a named part, such as 'handle', at the player hand anchor.",
+      "Automatically corrects java_block hand display settings by centering a named part, such as 'handle', at the player hand anchor. Run auto_correct_center first if the model geometry itself is offset.",
     annotations: {
       title: "Auto Correct Display Settings",
       destructiveHint: true,
@@ -77,204 +84,8 @@ export const displayToolDocs: ToolSpec[] = [
   },
 ];
 
-function normalizeName(name: string | undefined | null): string {
-  return (name ?? "").trim().toLowerCase();
-}
-
-function roundNumber(value: number, decimals: number = 6): number {
-  const factor = 10 ** decimals;
-  return Math.round(value * factor) / factor;
-}
-
-function roundVec3(vector: ThreeNamespace.Vector3 | Vec3Tuple): Vec3Tuple {
-  if (!Array.isArray(vector)) {
-    return [
-      roundNumber(vector.x),
-      roundNumber(vector.y),
-      roundNumber(vector.z),
-    ];
-  }
-
-  return [
-    roundNumber(vector[0]),
-    roundNumber(vector[1]),
-    roundNumber(vector[2]),
-  ];
-}
-
 function isLeftHandSlot(slot: HandSlot): boolean {
   return slot.includes("lefthand");
-}
-
-function describeMatch(match: NamedMatch): string {
-  const kind = match instanceof Group ? "group" : match.type || "element";
-  return `${kind} "${match.name}" (${match.uuid})`;
-}
-
-function listExactNameMatches(partName: string): NamedMatch[] {
-  const normalized = normalizeName(partName);
-  const groups = (Group.all ?? []).filter(
-    (group) => normalizeName(group.name) === normalized
-  );
-  const elements = (Outliner.elements ?? []).filter(
-    (element) => normalizeName(element.name) === normalized
-  );
-  return [...groups, ...elements];
-}
-
-function findUniqueNamedMatchOrThrow(partName: string): NamedMatch {
-  const matches = listExactNameMatches(partName);
-
-  if (matches.length === 0) {
-    throw new Error(
-      `No group or element named "${partName}" was found. Create exactly one matching part, then try again.`
-    );
-  }
-
-  if (matches.length > 1) {
-    throw new Error(
-      `Found multiple exact matches for "${partName}": ${matches
-        .map(describeMatch)
-        .join(", ")}. Rename the extras so only one remains.`
-    );
-  }
-
-  return matches[0];
-}
-
-function expandModelBoundsFromSceneObject(
-  bounds: ThreeNamespace.Box3,
-  sceneObject: ThreeNamespace.Object3D | undefined,
-  projectModel: ThreeNamespace.Object3D
-): boolean {
-  if (!sceneObject || sceneObject.visible === false) {
-    return false;
-  }
-
-  sceneObject.updateWorldMatrix(true, true);
-
-  const geometry = (
-    sceneObject as ThreeNamespace.Object3D & {
-      geometry?: ThreeNamespace.BufferGeometry;
-    }
-  ).geometry;
-  if (!geometry) {
-    return false;
-  }
-
-  if (!geometry.boundingBox) {
-    geometry.computeBoundingBox();
-  }
-
-  const geometryBounds = geometry.boundingBox;
-  if (!geometryBounds || geometryBounds.isEmpty()) {
-    return false;
-  }
-
-  const corners = [
-    new Three.Vector3(
-      geometryBounds.min.x,
-      geometryBounds.min.y,
-      geometryBounds.min.z
-    ),
-    new Three.Vector3(
-      geometryBounds.min.x,
-      geometryBounds.min.y,
-      geometryBounds.max.z
-    ),
-    new Three.Vector3(
-      geometryBounds.min.x,
-      geometryBounds.max.y,
-      geometryBounds.min.z
-    ),
-    new Three.Vector3(
-      geometryBounds.min.x,
-      geometryBounds.max.y,
-      geometryBounds.max.z
-    ),
-    new Three.Vector3(
-      geometryBounds.max.x,
-      geometryBounds.min.y,
-      geometryBounds.min.z
-    ),
-    new Three.Vector3(
-      geometryBounds.max.x,
-      geometryBounds.min.y,
-      geometryBounds.max.z
-    ),
-    new Three.Vector3(
-      geometryBounds.max.x,
-      geometryBounds.max.y,
-      geometryBounds.min.z
-    ),
-    new Three.Vector3(
-      geometryBounds.max.x,
-      geometryBounds.max.y,
-      geometryBounds.max.z
-    ),
-  ];
-
-  for (const corner of corners) {
-    corner.applyMatrix4(sceneObject.matrixWorld);
-    bounds.expandByPoint(projectModel.worldToLocal(corner));
-  }
-
-  return true;
-}
-
-function collectModelSpaceBoundsForGroup(
-  group: Group,
-  projectModel: ThreeNamespace.Object3D
-): ThreeNamespace.Box3 {
-  const bounds = new Three.Box3();
-  let hasGeometry = false;
-
-  const visit = (node: OutlinerNode) => {
-    if (node instanceof Group) {
-      node.children.forEach(visit);
-      return;
-    }
-
-    if (!(node instanceof OutlinerElement)) {
-      return;
-    }
-
-    if (expandModelBoundsFromSceneObject(bounds, node.scene_object, projectModel)) {
-      hasGeometry = true;
-    }
-  };
-
-  visit(group);
-
-  if (!hasGeometry) {
-    throw new Error(
-      `Group "${group.name}" does not contain any usable rendered geometry.`
-    );
-  }
-
-  return bounds;
-}
-
-function getModelSpaceBoundsForMatch(match: NamedMatch): ThreeNamespace.Box3 {
-  const project = Project;
-  if (!project?.model_3d) {
-    throw new Error("No project 3D model is available.");
-  }
-
-  project.model_3d.updateMatrixWorld(true);
-
-  if (match instanceof Group) {
-    return collectModelSpaceBoundsForGroup(match, project.model_3d);
-  }
-
-  const bounds = new Three.Box3();
-  if (!expandModelBoundsFromSceneObject(bounds, match.scene_object, project.model_3d)) {
-    throw new Error(
-      `${describeMatch(match)} does not contain any usable rendered geometry.`
-    );
-  }
-
-  return bounds;
 }
 
 function getHandleAlignmentPoint(
@@ -287,19 +98,15 @@ function getHandleAlignmentPoint(
 }
 
 function getDisplayModeModelOffset(): ThreeNamespace.Vector3 {
-  const project = Project;
-  if (!project) {
+  if (!Project) {
     throw new Error("No project is open in Blockbench.");
   }
 
-  // Blockbench display mode re-parents the model under display_base and shifts it
-  // before applying display slot transforms. Mirror that offset here so the
-  // translation correction matches what the display preview actually renders.
   if (typeof Modes !== "undefined" && Modes.display) {
-    return project.model_3d.position.clone();
+    return Project.model_3d.position.clone();
   }
 
-  const xzOffset = project.format?.centered_grid ? 0 : -8;
+  const xzOffset = Project.format?.centered_grid ? 0 : -8;
   return new Three.Vector3(xzOffset, -8, xzOffset);
 }
 
@@ -307,18 +114,17 @@ function getOrCreateHandSlot(slotName: HandSlot): {
   slot: DisplaySlot;
   createdFromPreset: boolean;
 } {
-  const project = Project;
-  if (!project) {
+  if (!Project) {
     throw new Error("No project is open in Blockbench.");
   }
 
-  let slot = project.display_settings[slotName] as DisplaySlot | undefined;
+  let slot = Project.display_settings[slotName] as DisplaySlot | undefined;
   let createdFromPreset = false;
 
   if (!slot) {
     slot = new DisplaySlot(slotName, {});
     slot.extend(HANDHELD_PRESET_DEFAULTS[slotName]);
-    project.display_settings[slotName] = slot;
+    Project.display_settings[slotName] = slot;
     createdFromPreset = true;
   }
 
@@ -414,15 +220,7 @@ export function registerDisplayTools() {
     {
       ...displayToolDocs[0],
       async execute({ strategy, part_name }) {
-        if (!Project) {
-          throw new Error("No project is open in Blockbench.");
-        }
-
-        if (Project.format?.id !== "java_block") {
-          throw new Error(
-            `This tool only works with java_block projects. Current project format is "${Project.format?.id ?? "unknown"}".`
-          );
-        }
+        assertJavaBlockProject();
 
         if (strategy !== "handle") {
           throw new Error(
