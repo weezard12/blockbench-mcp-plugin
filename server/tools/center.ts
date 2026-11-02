@@ -13,12 +13,13 @@ import {
   type Vec3Tuple,
 } from "./alignment-shared";
 
-interface CenterCorrectionResult {
+// A type alias, not an interface: structuredContent must be assignable to an index signature.
+type CenterCorrectionResult = {
   beforeCenter: Vec3Tuple;
   afterCenter: Vec3Tuple;
   delta: Vec3Tuple;
   targetCenter: Vec3Tuple;
-}
+};
 
 export const autoCorrectCenterParameters = z.object({});
 

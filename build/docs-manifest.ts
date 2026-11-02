@@ -9,7 +9,6 @@ import { cubeUvToolDocs } from "@/server/tools/cube-uv";
 import { displayToolDocs } from "@/server/tools/display";
 import { autoCorrectDisplayToolDocs } from "@/server/tools/auto-correct-display";
 import { centerToolDocs } from "@/server/tools/center";
-import { autoCorrectDisplayToolDocs } from "@/server/tools/auto-correct-display";
 import { elementToolDocs } from "@/server/tools/element";
 import { importToolDocs } from "@/server/tools/import";
 import { knifeToolDocs } from "@/server/tools/knife";
