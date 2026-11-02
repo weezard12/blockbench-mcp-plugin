@@ -9,6 +9,7 @@ import { cubeUvToolDocs } from "@/server/tools/cube-uv";
 import { displayToolDocs } from "@/server/tools/display";
 import { autoCorrectDisplayToolDocs } from "@/server/tools/auto-correct-display";
 import { centerToolDocs } from "@/server/tools/center";
+import { autoCorrectAnatomyToolDocs } from "@/server/tools/auto-correct-anatomy";
 import { elementToolDocs } from "@/server/tools/element";
 import { importToolDocs } from "@/server/tools/import";
 import { knifeToolDocs } from "@/server/tools/knife";
@@ -52,7 +53,7 @@ export const toolManifest: ICategoryGroup[] = [
   { category: "Paint Tools", tools: paintToolDocs },
   { category: "Particles", tools: particleToolDocs },
   { category: "Performance", tools: performanceToolDocs },
-  { category: "Project", tools: [...projectToolDocs, ...centerToolDocs] },
+  { category: "Project", tools: [...projectToolDocs, ...centerToolDocs, ...autoCorrectAnatomyToolDocs] },
   { category: "Textures", tools: textureToolDocs },
   { category: "UI Interaction", tools: [...uiToolDocs, ...modeToolDocs] },
   { category: "UV Mapping", tools: [...uvToolDocs, ...cubeUvToolDocs] },

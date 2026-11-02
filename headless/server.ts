@@ -20,13 +20,14 @@ import { editTools } from "./tools/edit";
 import { inspectTools } from "./tools/inspect";
 import { particleTools } from "./tools/particle";
 import { renderTools } from "./tools/render";
+import { repairTools } from "./tools/repair";
 import { validateTools } from "./tools/validate";
 
 /** Server name reported to clients. */
 export const HEADLESS_SERVER_NAME = "blockbench-mcp-headless";
 
 /** Every headless tool, in listing order. */
-export const HEADLESS_TOOLS: readonly IRegistrableTool[] = [...inspectTools, ...validateTools, ...editTools, ...particleTools, ...convertTools, ...renderTools, ...appTools];
+export const HEADLESS_TOOLS: readonly IRegistrableTool[] = [...inspectTools, ...validateTools, ...editTools, ...repairTools, ...particleTools, ...convertTools, ...renderTools, ...appTools];
 
 const INSTRUCTIONS = [
   "Edits and checks Blockbench .bbmodel files directly on disk, without the Blockbench app, so several agents can work in parallel.",
